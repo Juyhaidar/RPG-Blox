@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aesthetica: Open World RPG - Created by @newtoen Haidar</title>
+<style>
+:root{--sand:#F7F3E9;--cream:#FFFDF9;--border:#E2D7C8;--clay:#D06A4C;--clay-dark:#B25338;--clay-light:#F7ECE8;--sage:#6F9377;--sage-dark:#4F7057;--sage-light:#EBF2ED;--amber:#E29D38;--amber-light:#FCF4E8;--slate:#4E6174;--charcoal:#2D2B29;--muted:#7A746E;--pill:999px;--shadow:0 4px 16px rgba(80,60,40,0.08)}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none}
+body{background:var(--sand);background-image:radial-gradient(var(--border) 1.2px,transparent 1.2px);background-size:20px 20px;color:var(--charcoal);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:10px}
+.game-app{width:100%;max-width:960px;background:var(--cream);border:2px solid var(--border);border-radius:18px;box-shadow:0 10px 30px rgba(90,70,50,0.12);overflow:hidden;display:flex;flex-direction:column;position:relative}
+header.game-hdr{background:#FAF6EE;border-bottom:2px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.brand-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge-tag{background:var(--clay);color:#FFF;font-size:11px;font-weight:800;padding:3px 9px;border-radius:var(--pill);text-transform:uppercase}
+.brand-title{font-size:16px;font-weight:800;color:var(--charcoal)}
+.author-pill{background:var(--sage-light);color:var(--sage-dark);border:1px solid #C5DAC8;font-size:11px;font-weight:800;padding:3px 10px;border-radius:var(--pill)}
+.coin-pill{background:var(--amber-light);border:1.5px solid #F0D4A8;color:#8F5708;font-weight:800;font-size:12px;padding:4px 12px;border-radius:var(--pill)}
+.clock-pill{background:#EDF2F7;color:var(--slate);font-weight:700;font-size:11px;padding:4px 10px;border-radius:var(--pill)}
+nav.game-nav{background:#F5EFE4;border-bottom:2px solid var(--border);padding:6px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.nav-btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn-nav,.btn-sound{background:var(--cream);border:1.5px solid var(--border);color:var(--charcoal);font-size:12px;font-weight:700;padding:5px 12px;border-radius:var(--pill);cursor:pointer;transition:all .15s}
+.btn-nav:hover{border-color:var(--clay);color:var(--clay-dark);transform:translateY(-1px)}
+.viewport-box{position:relative;width:100%;aspect-ratio:16/9;min-height:440px;background:#2D3136;overflow:hidden}
+#gameCanvas{display:block;width:100%;height:100%;cursor:crosshair}
+.hud-profile{position:absolute;top:12px;left:12px;background:rgba(253,251,247,0.95);backdrop-filter:blur(6px);border:2px solid var(--border);border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);cursor:pointer}
+.hud-avatar-box{width:44px;height:44px;border-radius:50%;background:var(--clay-light);border:2px solid var(--clay);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hud-avatar-box canvas{width:100%;height:100%}
+.hud-bars{display:flex;flex-direction:column;gap:3px;width:120px}
+.bar-row{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:800}
+.bar-track{flex:1;height:7px;background:#E6DFD5;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width .2s}
+.fill-hp{background:linear-gradient(90deg,#E25B5B,#F87171)}
+.fill-energy{background:linear-gradient(90deg,#E69D24,#FBBF24)}
+.fill-food{background:linear-gradient(90deg,#DD6B20,#F6AD55)}
+.fill-exp{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
+.quest-hud-box{position:absolute;top:12px;right:12px;max-width:220px;background:rgba(253,251,247,0.95);backdrop-filter:blur(6px);border:2px solid var(--border);border-radius:12px;padding:7px 12px;font-size:11px;box-shadow:var(--shadow)}
+.prompt-bubble{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(45,43,41,0.92);color:#FFF;padding:6px 16px;border-radius:var(--pill);font-size:12px;font-weight:700;display:none;align-items:center;gap:6px;box-shadow:var(--shadow);z-index:10}
+.prompt-key{background:var(--amber);color:#2D2B29;font-weight:900;padding:1px 6px;border-radius:4px;font-size:10px}
+.toast-bar{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:rgba(253,251,247,0.96);border:2px solid var(--sage);color:var(--sage-dark);font-size:12px;font-weight:800;padding:6px 16px;border-radius:var(--pill);box-shadow:var(--shadow);z-index:30;opacity:0;pointer-events:none;transition:all .25s}
+.toast-bar.show{opacity:1;transform:translateX(-50%) translateY(4px)}
+.dlg-window{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:720px;background:rgba(255,253,249,0.98);border:2px solid var(--border);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow);display:none;z-index:40}
+.dlg-flex{display:flex;gap:14px;align-items:flex-start}
+.dlg-icon-box{width:48px;height:48px;background:#F4EDE2;border:2px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.btn-opt{background:var(--slate);color:#FFF;border:none;font-size:11px;font-weight:700;padding:5px 12px;border-radius:var(--pill);cursor:pointer}
+.fishing-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(253,251,247,0.97);border:2px solid var(--border);border-radius:12px;padding:14px 20px;display:none;flex-direction:column;align-items:center;gap:10px;z-index:50;box-shadow:var(--shadow)}
+.fish-track{width:36px;height:180px;background:#D6E4EE;border:2px solid var(--slate);border-radius:8px;position:relative;overflow:hidden}
+.fish-target{position:absolute;left:0;right:0;height:44px;background:rgba(111,147,119,0.6);border:2px dashed var(--sage-dark);border-radius:5px}
+.fish-hook{position:absolute;left:5px;width:22px;height:22px;font-size:18px;display:flex;align-items:center;justify-content:center}
+.fish-meter{width:100%;height:8px;background:#E2D9CD;border-radius:99px;overflow:hidden}
+.fish-meter-fill{height:100%;background:var(--sage);width:30%}
+.mobile-dpad-box{position:absolute;bottom:10px;left:0;right:0;padding:0 14px;display:none;justify-content:space-between;align-items:flex-end;z-index:20;pointer-events:none}
+.dpad-grid{width:110px;height:110px;position:relative;pointer-events:auto}
+.dbtn{position:absolute;width:34px;height:34px;background:rgba(253,251,247,0.88);border:1.5px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold}
+.dbtn-u{top:0;left:38px}.dbtn-d{bottom:0;left:38px}.dbtn-l{top:38px;left:0}.dbtn-r{top:38px;right:0}
+.tbtn{width:48px;height:48px;border-radius:50%;background:var(--clay);border:2px solid #FFF;color:#FFF;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);pointer-events:auto}
+footer.game-ftr{background:#FAF6EE;border-top:2px solid var(--border);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hotbar-cell{width:38px;height:38px;background:var(--cream);border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative;transition:all .15s}
+.hotbar-cell.active{border-color:var(--clay);background:var(--clay-light)}
+.hotbar-cell .knum{position:absolute;top:1px;left:3px;font-size:8px;font-weight:800;color:var(--muted)}
+.kbd-hint{font-size:11px;font-weight:700;color:var(--muted);display:flex;gap:6px}
+.kbd-hint kbd{background:#E7DFD4;color:var(--charcoal);padding:2px 5px;border-radius:4px}
+.modal-mask{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(45,40,35,0.45);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:14px}
+.modal-mask.active{display:flex}
+.modal-box{background:var(--cream);border:2px solid var(--border);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,0.15);width:100%;max-width:720px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-title-bar{background:#FAF5EA;border-bottom:2px solid var(--border);padding:12px 18px;display:flex;justify-content:space-between;align-items:center}
+.btn-close-x{background:none;border:none;font-size:20px;font-weight:800;color:var(--muted);cursor:pointer;padding:2px 8px;border-radius:6px}
+.modal-main{padding:14px 18px;overflow-y:auto;flex:1}
+.modal-bottom{background:#FAF5EA;border-top:2px solid var(--border);padding:10px 18px;display:flex;justify-content:space-between;align-items:center}
+.btn-pill{background:var(--clay);color:#FFF;border:none;padding:6px 16px;border-radius:var(--pill);font-size:12px;font-weight:800;cursor:pointer}
+.btn-pill:hover{background:var(--clay-dark)}
+.custom-grid{display:grid;grid-template-columns:190px 1fr;gap:14px}
+@media(max-width:640px){.custom-grid{grid-template-columns:1fr}}
+.mirror-box{background:#F5EEE2;border:2px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px}
+#mirrorCanvas{width:130px;height:150px;background:#FFF;border-radius:10px;border:1.5px solid var(--border)}
+.c-sec{margin-bottom:10px}
+.c-lbl{font-size:11px;font-weight:800;color:var(--charcoal);margin-bottom:4px;display:block}
+.pill-list{display:flex;flex-wrap:wrap;gap:5px}
+.pill-opt{background:var(--cream);border:1.5px solid var(--border);padding:4px 10px;border-radius:var(--pill);font-size:11px;font-weight:700;cursor:pointer}
+.pill-opt.active{background:var(--clay);border-color:var(--clay-dark);color:#FFF}
+.swatch-list{display:flex;flex-wrap:wrap;gap:6px}
+.swatch-dot{width:22px;height:22px;border-radius:50%;border:2px solid #FFF;box-shadow:0 1px 3px rgba(0,0,0,0.2);cursor:pointer}
+.swatch-dot.active{box-shadow:0 0 0 2.5px var(--clay);transform:scale(1.1)}
+.field-input{width:100%;padding:6px 10px;border-radius:6px;border:1.5px solid var(--border);font-size:12px;font-family:inherit;font-weight:600}
+.inv-grid-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;background:#F5EEE2;border:2px solid var(--border);border-radius:10px;padding:10px;max-height:250px;overflow-y:auto}
+.inv-cell{aspect-ratio:1;background:var(--cream);border:2px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;position:relative}
+.inv-cell.selected{border-color:var(--clay);background:var(--clay-light)}
+.inv-cell .c-count{position:absolute;bottom:2px;right:3px;font-size:9px;font-weight:800;background:rgba(255,255,255,0.85);padding:0 3px;border-radius:3px}
+.shop-grid-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.shop-card{background:#FFF;border:1.5px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;justify-content:space-between;gap:6px}
+@media(max-width:768px){.mobile-dpad-box{display:flex}.kbd-hint{display:none}.viewport-box{min-height:380px}}
+</style>
+</head>
+<body>
+<div class="game-app">
+  <header class="game-hdr">
+    <div class="brand-box">
+      <span class="badge-tag">Open World RPG</span>
+      <span class="brand-title">Aesthetica: Warm Realm</span>
+      <span class="author-pill">✨ Created by @newtoen Haidar</span>
+    </div>
+    <div class="header-meta">
+      <div class="coin-pill" title="Koin Unlimited!">🪙 <span id="topCoin">999,999 (Unlimited ∞)</span></div>
+      <div class="clock-pill" id="topClock">☀️ Hari 1 • 10:00 AM | 🍃 Sejuk</div>
+    </div>
+  </header>
+
+  <nav class="game-nav">
+    <div class="nav-btns">
+      <button class="btn-nav" onclick="openModal('modalProfile')">👤 Profil & Avatar <small>[C]</small></button>
+      <button class="btn-nav" onclick="openModal('modalInv')">🎒 Inventory <small>[I]</small></button>
+      <button class="btn-nav" onclick="openModal('modalQuests')">📜 Quest <small>[Q]</small></button>
+      <button class="btn-nav" onclick="openModal('modalShop')">🏪 Toko Oliver <small>[T]</small></button>
+      <button class="btn-nav" onclick="openModal('modalMap')">🗺️ Peta Dunia <small>[M]</small></button>
+    </div>
+    <button class="btn-sound" id="btnSound" onclick="toggleAudio()">🔊 Suara: ON</button>
+  </nav>
+
+  <div class="viewport-box">
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+    <div class="hud-profile" onclick="openModal('modalProfile')">
+      <div class="hud-avatar-box"><canvas id="hudAvatar" width="44" height="44"></canvas></div>
+      <div class="hud-bars">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <b style="font-size:11px;" id="hudName">Haidar</b>
+          <span style="font-size:9px;background:var(--amber-light);color:#945B0A;padding:1px 5px;border-radius:3px;" id="hudTitle">Herbalist</span>
+        </div>
+        <div class="bar-row"><span>❤️</span><div class="bar-track"><div class="bar-fill fill-hp" id="barHp" style="width:100%;"></div></div><span id="txtHp" style="width:32px;text-align:right;">100</span></div>
+        <div class="bar-row"><span>⚡</span><div class="bar-track"><div class="bar-fill fill-energy" id="barEnergy" style="width:100%;"></div></div><span id="txtEnergy" style="width:32px;text-align:right;">100</span></div>
+        <div class="bar-row"><span>🍞</span><div class="bar-track"><div class="bar-fill fill-food" id="barFood" style="width:100%;"></div></div><span id="txtFood" style="width:32px;text-align:right;">100</span></div>
+        <div class="bar-row"><span>⭐</span><div class="bar-track"><div class="bar-fill fill-exp" id="barExp" style="width:40%;"></div></div><span id="txtExp" style="width:32px;text-align:right;">Lv.1</span></div>
+      </div>
+    </div>
+
+    <div class="quest-hud-box">
+      <div style="font-weight:800;color:var(--clay);font-size:10px;text-transform:uppercase;">📜 Quest Aktif</div>
+      <b style="font-size:11px;" id="qTitle">Jelajahi Desa Sunfall</b>
+      <div style="color:var(--muted);font-size:10px;line-height:1.3;" id="qDesc">Sapa Oliver di Toko atau Rowan si Penyihir.</div>
+    </div>
+
+    <div class="prompt-bubble" id="promptBar">
+      <span class="prompt-key">E / Spasi</span>
+      <span id="promptTxt">Tekan E untuk Berinteraksi</span>
+    </div>
+
+    <div class="toast-bar" id="toast">Item diperoleh!</div>
+
+    <div class="dlg-window" id="dlgBox">
+      <div class="dlg-flex">
+        <div class="dlg-icon-box" id="dlgIcon">🧙‍♂️</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:800;color:var(--clay);" id="dlgName">Rowan si Penyihir</div>
+          <div style="font-size:12px;margin:4px 0 8px;color:var(--charcoal);line-height:1.4;" id="dlgMsg">Halo petualang! Selamat datang di Aesthetica Realm.</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="dlgOptions"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fishing-panel" id="fishPanel">
+      <b style="font-size:13px;">🎣 Memancing Ikan</b>
+      <span style="font-size:10px;color:var(--muted);">Tahan Klik / Spasi agar umpan di zona hijau!</span>
+      <div class="fish-track"><div class="fish-target" id="fishTarget"></div><div class="fish-hook" id="fishHook">🐟</div></div>
+      <div class="fish-meter"><div class="fish-meter-fill" id="fishMeterFill"></div></div>
+      <button class="btn-pill" style="background:#888;font-size:10px;padding:3px 10px;" onclick="closeFishing(false)">Batal</button>
+    </div>
+
+    <div class="mobile-dpad-box">
+      <div class="dpad-grid">
+        <div class="dbtn dbtn-u" id="dpadU">▲</div><div class="dbtn dbtn-d" id="dpadD">▼</div>
+        <div class="dbtn dbtn-l" id="dpadL">◀</div><div class="dbtn dbtn-r" id="dpadR">▶</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;pointer-events:auto;">
+        <button class="tbtn" style="background:var(--amber);width:40px;height:40px;" id="btnSprint">Lari</button>
+        <button class="tbtn" id="btnAct">Aksi</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="game-ftr">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:11px;font-weight:800;color:var(--muted);">Peralatan:</span>
+      <div id="hotbarList" style="display:flex;gap:6px;"></div>
+    </div>
+    <div class="kbd-hint">
+      <span><kbd>W,A,S,D</kbd> Gerak</span><span><kbd>Shift</kbd> Lari</span><span><kbd>E / Spasi</kbd> Aksi</span>
+      <span><kbd>C</kbd> Avatar</span><span><kbd>I</kbd> Tas</span><span><kbd>M</kbd> Peta</span>
+    </div>
+  </footer>
+</div>
+
+<!-- MODAL: PROFILE -->
+<div class="modal-mask" id="modalProfile">
+  <div class="modal-box">
+    <div class="modal-title-bar">
+      <h3><span>👤</span> Konfigurasi Avatar & Profil Karakter</h3>
+      <button class="btn-close-x" onclick="closeAllModals()">&times;</button>
+    </div>
+    <div class="modal-main">
+      <div class="custom-grid">
+        <div class="mirror-box">
+          <canvas id="mirrorCanvas" width="130" height="150"></canvas>
+          <div style="text-align:center;">
+            <b style="font-size:13px;" id="mName">Haidar</b>
+            <div style="font-size:10px;color:var(--muted);" id="mTitle">Wandering Herbalist</div>
+          </div>
+          <button class="btn-pill" style="background:var(--slate);font-size:10px;padding:4px 10px;" onclick="randomizeAvatar()">🎲 Acak Tampilan</button>
+        </div>
+        <div>
+          <div class="c-sec">
+            <label class="c-lbl">Nama & Gelar</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <input type="text" id="inName" class="field-input" value="Haidar" maxlength="16" oninput="updateProfileMeta()">
+              <select id="selTitle" class="field-input" onchange="updateProfileMeta()">
+                <option value="Wandering Herbalist">🌿 Wandering Herbalist</option>
+                <option value="Cozy Adventurer">☕ Cozy Adventurer</option>
+                <option value="Sunfall Guardian">🛡️ Sunfall Guardian</option>
+                <option value="Forest Whisperer">🌲 Forest Whisperer</option>
+                <option value="Star Alchemist">✨ Star Alchemist</option>
+              </select>
+            </div>
+          </div>
+          <div class="c-sec"><label class="c-lbl">Gaya Rambut</label><div class="pill-list" id="optHair"></div></div>
+          <div class="c-sec"><label class="c-lbl">Warna Rambut</label><div class="swatch-list" id="palHair"></div></div>
+          <div class="c-sec"><label class="c-lbl">Warna Kulit (Pastel Warm)</label><div class="swatch-list" id="palSkin"></div></div>
+          <div class="c-sec"><label class="c-lbl">Pakaian & Warna Baju</label><div class="pill-list" id="optOutfit" style="margin-bottom:6px;"></div><div class="swatch-list" id="palOutfit"></div></div>
+          <div class="c-sec"><label class="c-lbl">Aksesoris Kepala (Topi)</label><div class="pill-list" id="optHat"></div></div>
+          <div class="c-sec"><label class="c-lbl">Aksesoris Punggung</label><div class="pill-list" id="optBack"></div></div>
+          <div class="c-sec"><label class="c-lbl">Alat / Senjata di Tangan</label><div class="pill-list" id="optTool"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-bottom">
+      <span style="font-size:11px;color:var(--muted);">Tersimpan otomatis ke dunia permainan!</span>
+      <button class="btn-pill" onclick="closeAllModals();showToast('Avatar berhasil diperbarui!');">✓ Terapkan & Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: INVENTORY -->
+<div class="modal-mask" id="modalInv">
+  <div class="modal-box">
+    <div class="modal-title-bar">
+      <h3><span>🎒</span> Tas Inventory Petualang</h3>
+      <button class="btn-close-x" onclick="closeAllModals()">&times;</button>
+    </div>
+    <div class="modal-main">
+      <div style="display:grid;grid-template-columns:1fr 190px;gap:12px;">
+        <div class="inv-grid-box" id="invGrid"></div>
+        <div style="background:#FAF6EE;border:1.5px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:24px;" id="insIcon">🍞</span>
+            <div><b style="font-size:12px;" id="insName">Roti Madu</b><div style="font-size:9px;color:var(--muted);" id="insType">Makanan</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.3;" id="insDesc">Roti madu hutan hangat.</div>
+          <div style="font-size:10px;font-weight:700;color:var(--sage-dark);" id="insEffect">+35 Food, +20 Energy</div>
+          <div style="margin-top:auto;display:flex;flex-direction:column;gap:6px;">
+            <button class="btn-pill" id="btnUseItem" onclick="useSelectedItem()">Gunakan / Makan</button>
+            <button class="btn-pill" style="background:var(--slate);" onclick="equipSelectedItem()">Pasang ke Hotbar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-bottom">
+      <span style="font-size:11px;font-weight:800;color:#8F5708;">🪙 Koinmu: 999,999 (Unlimited ∞)</span>
+      <button class="btn-pill" onclick="closeAllModals()">Selesai</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SHOP -->
+<div class="modal-mask" id="modalShop">
+  <div class="modal-box">
+    <div class="modal-title-bar">
+      <h3><span>🏪</span> Toko Serba Ada Oliver</h3>
+      <button class="btn-close-x" onclick="closeAllModals()">&times;</button>
+    </div>
+    <div class="modal-main">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Oliver: <i>"Koinmu tanpa batas, Haidar! Ambil item langka apa saja sesukamu!"</i></p>
+      <div class="shop-grid-box" id="shopGrid"></div>
+    </div>
+    <div class="modal-bottom">
+      <span style="font-size:11px;color:var(--sage-dark);font-weight:700;">✨ Pembelian gratis langsung masuk ke tas!</span>
+      <button class="btn-pill" onclick="closeAllModals()">Tutup Toko</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: QUESTS -->
+<div class="modal-mask" id="modalQuests">
+  <div class="modal-box">
+    <div class="modal-title-bar">
+      <h3><span>📜</span> Jurnal Catatan Quest</h3>
+      <button class="btn-close-x" onclick="closeAllModals()">&times;</button>
+    </div>
+    <div class="modal-main"><div id="questList" style="display:flex;flex-direction:column;gap:8px;"></div></div>
+    <div class="modal-bottom">
+      <span style="font-size:11px;color:var(--muted);">Selesaikan quest untuk naik level!</span>
+      <button class="btn-pill" onclick="closeAllModals()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MAP -->
+<div class="modal-mask" id="modalMap">
+  <div class="modal-box">
+    <div class="modal-title-bar">
+      <h3><span>🗺️</span> Peta Wilayah Aesthetica</h3>
+      <button class="btn-close-x" onclick="closeAllModals()">&times;</button>
+    </div>
+    <div class="modal-main">
+      <canvas id="mapCanvas" width="680" height="340" style="width:100%;border:1.5px solid var(--border);border-radius:10px;background:#EFE8DA;display:block;"></canvas>
+      <div style="display:flex;justify-content:space-around;margin-top:8px;font-size:11px;font-weight:700;">
+        <span>🏡 Desa Sunfall</span><span>🍎 Kebun Mira</span><span>🌲 Hutan Pinus</span><span>💎 Gua Kristal</span><span>⛵ Danau Senja</span><span style="color:var(--clay);">🔴 Posisi Kamu</span>
+      </div>
+    </div>
+    <div class="modal-bottom"><button class="btn-pill" onclick="closeAllModals()">Tutup Peta</button></div>
+  </div>
+</div>
+
+<script>
+const AudioSys = {
+  ctx: null, enabled: true,
+  init() { if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+  play(f, t='sine', d=0.12, g=0.08) {
+    if (!this.enabled || !this.ctx) return;
+    try {
+      const o = this.ctx.createOscillator(), gn = this.ctx.createGain();
+      o.type = t; o.frequency.setValueAtTime(f, this.ctx.currentTime);
+      gn.gain.setValueAtTime(g, this.ctx.currentTime);
+      gn.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + d);
+      o.connect(gn); gn.connect(this.ctx.destination);
+      o.start(); o.stop(this.ctx.currentTime + d);
+    } catch(e){}
+  },
+  step() { this.play(180+Math.random()*30, 'triangle', 0.05, 0.02); },
+  pickup() { this.play(523, 'sine', 0.1, 0.06); setTimeout(() => this.play(659, 'sine', 0.15, 0.06), 70); },
+  eat() { this.play(320, 'triangle', 0.08, 0.07); setTimeout(() => this.play(440, 'sine', 0.12, 0.07), 80); },
+  coin() { this.play(987, 'sine', 0.08, 0.06); setTimeout(() => this.play(1318, 'sine', 0.18, 0.06), 60); },
+  lvlUp() { [523, 659, 784, 1046].forEach((f,i) => setTimeout(() => this.play(f, 'triangle', 0.2, 0.08), i*90)); }
+};
+
+function toggleAudio() {
+  AudioSys.init(); AudioSys.enabled = !AudioSys.enabled;
+  document.getElementById('btnSound').textContent = AudioSys.enabled ? '🔊 Suara: ON' : '🔇 Suara: OFF';
+}
+
+const ITEMS = {};
+[
+  ['berry','Sweet Berry','food','🫐','Buah manis semak liar.',20,10,5],
+  ['apple','Golden Apple','food','🍎','Apel renyah kebun Mira.',30,15,10],
+  ['mushroom','Truffle Hutan','food','🍄','Jamur wangi bawah pinus.',25,20,15],
+  ['bread','Roti Madu Hangat','food','🍞','Roti empuk oles madu murni.',45,25,20],
+  ['fish','Shimmer Trout','food','🐟','Ikan berkilau Danau Senja.',40,30,25],
+  ['tea','Teh Bintang Herbal','food','🍵','Seduhan herba pemulih energi.',20,80,30],
+  ['sword','Pedang Latihan','tool','🗡️','Pedang kayu halus.',0,0,0,'sword'],
+  ['wand','Tongkat Astral','tool','🪄','Tongkat sihir kristal hangat.',0,0,0,'wand'],
+  ['pickaxe','Beliung Kristal','tool','⛏️','Beliung tambang tajam.',0,0,0,'pickaxe'],
+  ['rod','Joran Pancing Emas','tool','🎣','Kail pancing presisi danau.',0,0,0,'rod'],
+  ['straw_hat','Topi Jerami','hat','👒','Topi teduh petualang.'],
+  ['wizard_hat','Topi Penyihir','hat','🧙‍♂️','Topi kerucut cendekiawan.'],
+  ['goggles','Kacamata Goggles','hat','🥽','Kacamata penjelajah debu.'],
+  ['flower_crown','Mahkota Bunga','hat','🌸','Untaian bunga pastel wangi.'],
+  ['backpack','Ransel Petualang','back','🎒','Tas ransel kulit serbaguna.'],
+  ['wings','Sayap Ngengat Sutra','back','🪽','Sayap sutra berkilau lembut.'],
+  ['amethyst','Kristal Amethyst','resource','💎','Permata ungu berkilau gua.'],
+  ['wood','Kayu Pinus','resource','🪵','Kayu wangi bahan bangunan.']
+].forEach(([id,name,type,icon,desc,food=0,energy=0,hp=0,toolKey]) => {
+  ITEMS[id] = { id, name, type, icon, desc, food, energy, hp, toolKey };
+});
+
+const QUESTS = [
+  { id:'q1', title:'Salam Kenal di Sunfall', desc:'Bicaralah dengan Rowan si Penyihir Hutan di dekat air mancur.', type:'talk', done:false, exp:50 },
+  { id:'q2', title:'Pemetik Buah Berry', desc:'Kumpulkan 3 Sweet Berry dari semak liar.', type:'item', target:'berry', count:3, done:false, exp:60 },
+  { id:'q3', title:'Panen Apel Emas', desc:'Guncang pohon apel di kebun barat untuk 2 Apel.', type:'item', target:'apple', count:2, done:false, exp:70 },
+  { id:'q4', title:'Sensasi Memancing', desc:'Tangkap 1 Ikan Shimmer Trout di danau selatan.', type:'item', target:'fish', count:1, done:false, exp:90 },
+  { id:'q5', title:'Kilau Gua Kristal', desc:'Tambang 1 Kristal Amethyst di tebing utara.', type:'item', target:'amethyst', count:1, done:false, exp:120 }
+];
+
+const OPTS = {
+  hairs: [{id:'messy',n:'Messy'},{id:'curly',n:'Curly'},{id:'braid',n:'Braid'},{id:'spiky',n:'Spiky'},{id:'bob',n:'Bob'}],
+  hairColors: ['#4A3728','#8B5A2B','#E29D38','#588157','#6C584C','#A5A58D'],
+  skinColors: ['#FDE2D1','#F5D0B5','#E8B298','#D49B7A','#9C6644','#7F5539'],
+  outfits: [{id:'tunic',n:'Tunic'},{id:'sweater',n:'Knit'},{id:'ranger',n:'Ranger'},{id:'scholar',n:'Scholar'}],
+  outfitColors: ['#D06A4C','#6F9377','#E29D38','#4E6174','#785964','#588157'],
+  hats: [{id:'none',n:'Tanpa Topi'},{id:'straw_hat',n:'Jerami'},{id:'wizard_hat',n:'Penyihir'},{id:'goggles',n:'Goggles'},{id:'flower_crown',n:'Bunga'}],
+  backs: [{id:'none',n:'Kosong'},{id:'backpack',n:'Ransel'},{id:'wings',n:'Sayap'}],
+  tools: [{id:'wand',n:'Tongkat'},{id:'sword',n:'Pedang'},{id:'pickaxe',n:'Beliung'},{id:'rod',n:'Pancing'}]
+};
+
+const G = {
+  canvas: null, ctx: null, mapCols: 64, mapRows: 64, tileSize: 40,
+  cam: { x: 0, y: 0 }, time: 100, daySecs: 360, day: 1,
+  player: {
+    x: 32*40, y: 32*40, w: 26, h: 28, speed: 3.2, dir: 'down', walkCycle: 0,
+    isMoving: false, isSprinting: false, hp: 100, maxHp: 100, energy: 100, maxEnergy: 100, food: 100, maxFood: 100,
+    exp: 40, maxExp: 100, lvl: 1, coins: 999999,
+    custom: { name:'Haidar', title:'Wandering Herbalist', skinColor:'#F5D0B5', hairStyle:'messy', hairColor:'#4A3728', outfitStyle:'tunic', outfitColor:'#D06A4C', hat:'straw_hat', back:'backpack', tool:'wand' },
+    inv: [], hotbar: [null, null, null, null, null], activeHotbar: 0
+  },
+  map: [], entities: [], particles: [], toastTimer: null
+};
+
+function initMap() {
+  G.map = [];
+  for (let r = 0; r < G.mapRows; r++) {
+    G.map[r] = [];
+    for (let c = 0; c < G.mapCols; c++) {
+      let t = 'grass';
+      const d = Math.hypot(c - 32, r - 32);
+      if (d < 11) {
+        if (Math.abs(c - 32) <= 1 || Math.abs(r - 32) <= 1) t = 'path';
+        else if (d < 6) t = 'cobble';
+      }
+      if (r > 48 && c > 12 && c < 52) t = 'water';
+      if (r >= 48 && r <= 52 && c >= 30 && c <= 34) t = 'bridge';
+      if (r < 14) t = 'mountain';
+      if (c < 16 && r > 18 && r < 44) t = 'farmland';
+      if (c > 44 && r > 16 && r < 46) t = 'forest';
+      G.map[r][c] = t;
+    }
+  }
+}
+
+function initEntities() {
+  G.entities = [
+    { id:'oliver', n:'Oliver (Pedagang)', type:'npc', x:35*40, y:30*40, icon:'🏪', dlg:{ s:'Oliver si Pedagang', p:'👨‍🌾', t:'Halo Haidar! Koinmu tak terbatas, belanja sesukamu!', opts:[{t:'🛍️ Buka Toko', a:'shop'},{t:'👋 Dah Oliver', a:'close'}] } },
+    { id:'rowan', n:'Rowan (Penyihir)', type:'npc', x:29*40, y:30*40, icon:'🧙‍♂️', dlg:{ s:'Rowan si Penyihir', p:'🧙‍♂️', t:'Salam damai! Nikmatilah petualangan di alam bebas ini.', opts:[{t:'✨ Berkah Energi Penuh', a:'heal'},{t:'👋 Makasih Rowan', a:'close'}] } },
+    { id:'mira', n:'Mira (Petani)', type:'npc', x:12*40, y:30*40, icon:'👩‍🌾', dlg:{ s:'Mira si Petani', p:'👩‍🌾', t:'Apel di kebunku sangat manis. Guncang saja pohonnya!', opts:[{t:'🍎 Minta Roti Madu', a:'bread'},{t:'👋 Dah Mira', a:'close'}] } },
+    { id:'jasper', n:'Jasper (Nelayan)', type:'npc', x:32*40, y:47*40, icon:'🎣', dlg:{ s:'Kapten Jasper', p:'🧔‍♂️', t:'Danau Senja penuh ikan Shimmer Trout! Tahan kail di kotak hijau!', opts:[{t:'👋 Selamat melaut!', a:'close'}] } },
+    { id:'sheep', n:'Barnaby (Domba)', type:'animal', x:10*40, y:33*40, icon:'🐑', t:'Mbeee~ (*Barnaby mengunyah rumput dengan damai*)' },
+    { id:'cat', n:'Pip (Kucing)', type:'animal', x:33*40, y:33*40, icon:'🐱', t:'Meong! (*Pip mendengkur senang saat dielus*)' },
+    { id:'c1', n:'Peti Sunfall', type:'chest', x:38*40, y:28*40, open:false, loot:[{it:ITEMS.tea, c:2},{it:ITEMS.flower_crown, c:1}] },
+    { id:'c2', n:'Peti Gua Kuno', type:'chest', x:32*40, y:6*40, open:false, loot:[{it:ITEMS.wings, c:1},{it:ITEMS.amethyst, c:2}] }
+  ];
+  [[29,26],[35,25],[38,35],[26,35],[48,24],[52,32]].forEach((p, i) => G.entities.push({ id:`b_${i}`, n:'Semak Berry', type:'berry_bush', x:p[0]*40, y:p[1]*40, ready:true }));
+  [[9,24],[13,22],[16,26],[10,34]].forEach((p, i) => G.entities.push({ id:`t_${i}`, n:'Pohon Apel', type:'apple_tree', x:p[0]*40, y:p[1]*40, apples:3 }));
+  [[28,10],[32,8],[36,9]].forEach((p, i) => G.entities.push({ id:`o_${i}`, n:'Urat Kristal', type:'ore', x:p[0]*40, y:p[1]*40, hits:3 }));
+  [[30,50],[34,50],[24,50]].forEach((p, i) => G.entities.push({ id:`f_${i}`, n:'Spot Mancing', type:'fish_spot', x:p[0]*40, y:p[1]*40 }));
+}
+
+function drawCharacter(ctx, x, y, c, dir='down', walk=0, scale=1) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
+  const bob = Math.sin(walk) * 2;
+  const circ = (cx,cy,r,col) => { ctx.fillStyle=col; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); };
+  const rect = (rx,ry,rw,rh,col) => { ctx.fillStyle=col; ctx.fillRect(rx,ry,rw,rh); };
+
+  ctx.fillStyle = 'rgba(40,30,20,0.2)'; ctx.beginPath(); ctx.ellipse(0, 15, 11, 4.5, 0, 0, Math.PI*2); ctx.fill();
+
+  if (c.back === 'backpack') rect(-9, -4+bob, 18, 13, '#7F5539');
+  else if (c.back === 'wings') {
+    ctx.fillStyle = 'rgba(255,230,240,0.7)'; ctx.beginPath();
+    ctx.ellipse(-12, -7+bob, 9, 5, -0.3, 0, Math.PI*2); ctx.ellipse(12, -7+bob, 9, 5, 0.3, 0, Math.PI*2); ctx.fill();
+  }
+
+  const legO = Math.sin(walk) * 3;
+  rect(-5, 7+bob+legO, 3.5, 7-legO, '#3F4E4F'); rect(2, 7+bob-legO, 3.5, 7+legO, '#3F4E4F');
+  ctx.fillStyle = c.outfitColor || '#D06A4C'; ctx.beginPath(); ctx.roundRect(-8, -6+bob, 16, 14, [4, 4, 2, 2]); ctx.fill();
+
+  circ(0, -11+bob, 9.5, c.skinColor || '#F5D0B5');
+
+  if (dir !== 'up') {
+    circ(-3.5, -12+bob, 1.5, '#2D2B29'); circ(3.5, -12+bob, 1.5, '#2D2B29');
+    circ(-5.5, -9+bob, 2.2, 'rgba(220,100,90,0.35)'); circ(5.5, -9+bob, 2.2, 'rgba(220,100,90,0.35)');
+  }
+
+  ctx.fillStyle = c.hairColor || '#4A3728';
+  if (c.hairStyle === 'curly') {
+    for (let a=Math.PI; a<=Math.PI*2; a+=0.5) circ(Math.cos(a)*10, Math.sin(a)*10-12+bob, 4, c.hairColor);
+  } else if (c.hairStyle === 'spiky') {
+    circ(0, -13+bob, 10, c.hairColor); rect(-6, -20+bob, 4, 7, c.hairColor); rect(1, -22+bob, 5, 9, c.hairColor);
+  } else {
+    ctx.beginPath(); ctx.arc(0, -13+bob, 10.5, Math.PI*0.9, Math.PI*2.1); ctx.fill(); rect(-10, -13+bob, 20, 5, c.hairColor);
+  }
+
+  if (c.hat === 'straw_hat') {
+    ctx.fillStyle = '#E8C587'; ctx.beginPath(); ctx.ellipse(0, -17+bob, 16, 5, 0, 0, Math.PI*2); ctx.fill();
+    rect(-7, -19+bob, 14, 2, '#D06A4C');
+  } else if (c.hat === 'wizard_hat') {
+    ctx.fillStyle = '#3D3B54'; ctx.beginPath(); ctx.moveTo(-8, -17+bob); ctx.lineTo(8, -17+bob); ctx.lineTo(1, -30+bob); ctx.closePath(); ctx.fill();
+  } else if (c.hat === 'goggles') {
+    circ(-4, -15+bob, 3.5, '#83C5BE'); circ(4, -15+bob, 3.5, '#83C5BE');
+  } else if (c.hat === 'flower_crown') {
+    ['#F28482','#F7EDE2','#84A59D'].forEach((col, i) => circ(-6+i*6, -17+bob, 2.8, col));
+  }
+
+  ctx.save(); ctx.translate(10, 0+bob);
+  if (c.tool === 'wand') { rect(0, -10, 2, 12, '#DDA15E'); circ(1, -12, 3.5, '#9D4EDD'); }
+  else if (c.tool === 'sword') rect(0, -12, 2.5, 14, '#8D99AE');
+  else if (c.tool === 'pickaxe') { rect(0, -8, 2, 10, '#6C584C'); ctx.strokeStyle='#48CAE4'; ctx.beginPath(); ctx.arc(1, -8, 5, Math.PI, Math.PI*2); ctx.stroke(); }
+  else if (c.tool === 'rod') rect(0, -14, 2, 16, '#BC6C25');
+  ctx.restore();
+  ctx.restore();
+}
+
+function drawTile(ctx, t, x, y, s) {
+  if (t === 'grass') {
+    ctx.fillStyle = '#9FC088'; ctx.fillRect(x, y, s, s);
+    ctx.fillStyle = '#89AC72'; ctx.fillRect(x + 6, y + 10, 3, 5);
+  } else if (t === 'path' || t === 'cobble') {
+    ctx.fillStyle = '#E8DEC8'; ctx.fillRect(x, y, s, s);
+    ctx.strokeStyle = '#D6C8AF'; ctx.strokeRect(x + 2, y + 2, s - 4, s - 4);
+  } else if (t === 'water') {
+    ctx.fillStyle = '#78A1BB'; ctx.fillRect(x, y, s, s);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(x + 4, y + 12, 12, 2);
+  } else if (t === 'bridge') {
+    ctx.fillStyle = '#C89D7C'; ctx.fillRect(x, y, s, s);
+  } else if (t === 'mountain') {
+    ctx.fillStyle = '#A39BA8'; ctx.fillRect(x, y, s, s);
+  } else if (t === 'farmland') {
+    ctx.fillStyle = '#D69F7E'; ctx.fillRect(x, y, s, s);
+    ctx.fillStyle = '#B88363'; ctx.fillRect(x + 2, y + 6, s - 4, 3);
+  } else {
+    ctx.fillStyle = '#738662'; ctx.fillRect(x, y, s, s);
+  }
+}
+
+function render() {
+  const p = G.player, ctx = G.ctx, cvs = G.canvas;
+  G.cam.x += (p.x - cvs.width / 2 - G.cam.x) * 0.1;
+  G.cam.y += (p.y - cvs.height / 2 - G.cam.y) * 0.1;
+
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  ctx.save();
+  ctx.translate(-Math.floor(G.cam.x), -Math.floor(G.cam.y));
+
+  const c1 = Math.max(0, Math.floor(G.cam.x / G.tileSize)), c2 = Math.min(G.mapCols, Math.ceil((G.cam.x + cvs.width) / G.tileSize));
+  const r1 = Math.max(0, Math.floor(G.cam.y / G.tileSize)), r2 = Math.min(G.mapRows, Math.ceil((G.cam.y + cvs.height) / G.tileSize));
+
+  for (let r = r1; r < r2; r++) {
+    for (let c = c1; c < c2; c++) drawTile(ctx, G.map[r][c], c * G.tileSize, r * G.tileSize, G.tileSize);
+  }
+
+  G.entities.forEach(e => {
+    if (e.type === 'npc' || e.type === 'animal') {
+      ctx.fillStyle = 'rgba(40,30,20,0.2)'; ctx.beginPath(); ctx.ellipse(e.x + 14, e.y + 26, 10, 4, 0, 0, Math.PI*2); ctx.fill();
+      ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(e.icon, e.x + 14, e.y + 24);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = 'bold 9px sans-serif';
+      const tw = ctx.measureText(e.n).width;
+      ctx.fillRect(e.x + 14 - tw / 2 - 3, e.y - 12, tw + 6, 12);
+      ctx.fillStyle = '#2D2B29'; ctx.fillText(e.n, e.x + 14, e.y - 3);
+    } else if (e.type === 'berry_bush') {
+      ctx.fillStyle = '#52796F'; ctx.beginPath(); ctx.arc(e.x + 16, e.y + 16, 13, 0, Math.PI*2); ctx.fill();
+      if (e.ready) {
+        ctx.fillStyle = '#E63946'; ctx.beginPath(); ctx.arc(e.x + 12, e.y + 12, 3, 0, Math.PI*2); ctx.arc(e.x + 20, e.y + 14, 3, 0, Math.PI*2); ctx.fill();
+      }
+    } else if (e.type === 'apple_tree') {
+      ctx.fillStyle = '#8B5A2B'; ctx.fillRect(e.x + 15, e.y + 20, 8, 20);
+      ctx.fillStyle = '#70A065'; ctx.beginPath(); ctx.arc(e.x + 19, e.y + 16, 18, 0, Math.PI*2); ctx.fill();
+      if (e.apples > 0) {
+        ctx.fillStyle = '#D90429'; ctx.beginPath(); ctx.arc(e.x + 14, e.y + 12, 3.5, 0, Math.PI*2); ctx.arc(e.x + 24, e.y + 16, 3.5, 0, Math.PI*2); ctx.fill();
+      }
+    } else if (e.type === 'ore') {
+      ctx.fillStyle = '#6C757D'; ctx.beginPath(); ctx.roundRect(e.x + 4, e.y + 8, 24, 18, 5); ctx.fill();
+      ctx.fillStyle = '#9D4EDD'; ctx.beginPath(); ctx.moveTo(e.x + 10, e.y + 8); ctx.lineTo(e.x + 14, e.y); ctx.lineTo(e.x + 18, e.y + 8); ctx.fill();
+    } else if (e.type === 'fish_spot') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5;
+      const w = (Date.now() / 400) % 12;
+      ctx.beginPath(); ctx.ellipse(e.x + 16, e.y + 16, 10 + w, 5 + w / 2, 0, 0, Math.PI*2); ctx.stroke();
+      ctx.font = '13px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('🐟', e.x + 16, e.y + 20);
+    } else if (e.type === 'chest') {
+      ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(e.open ? '📦' : '🎁', e.x + 14, e.y + 22);
+    }
+  });
+
+  drawCharacter(ctx, p.x + p.w / 2, p.y + p.h / 2, p.custom, p.dir, p.walkCycle);
+
+  for (let i = G.particles.length - 1; i >= 0; i--) {
+    const pt = G.particles[i]; pt.x += pt.vx; pt.y += pt.vy; pt.a -= 0.04;
+    if (pt.a <= 0) { G.particles.splice(i, 1); continue; }
+    ctx.fillStyle = pt.c; ctx.globalAlpha = pt.a; ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.s, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+  }
+
+  const hr = (G.time / G.daySecs) * 24;
+  if (hr >= 19 || hr < 5) { ctx.fillStyle = 'rgba(25, 30, 50, 0.4)'; ctx.fillRect(G.cam.x, G.cam.y, cvs.width, cvs.height); }
+  else if (hr >= 16) { ctx.fillStyle = 'rgba(230, 130, 70, 0.15)'; ctx.fillRect(G.cam.x, G.cam.y, cvs.width, cvs.height); }
+
+  ctx.restore();
+  requestAnimationFrame(render);
+}
+
+const keys = {};
+window.addEventListener('keydown', e => {
+  keys[e.key.toLowerCase()] = true;
+  if (e.key.toLowerCase() === 'c') openModal('modalProfile');
+  if (e.key.toLowerCase() === 'i') openModal('modalInv');
+  if (e.key.toLowerCase() === 'q') openModal('modalQuests');
+  if (e.key.toLowerCase() === 't') openModal('modalShop');
+  if (e.key.toLowerCase() === 'm') openModal('modalMap');
+  if (e.key.toLowerCase() === 'e' || e.code === 'Space') interact();
+  if (['1','2','3','4','5'].includes(e.key)) selectHotbar(parseInt(e.key) - 1);
+});
+window.addEventListener('keyup', e => { delete keys[e.key.toLowerCase()]; });
+
+function updateMove() {
+  const p = G.player;
+  let dx = 0, dy = 0;
+  if (keys['w'] || keys['arrowup']) dy -= 1;
+  if (keys['s'] || keys['arrowdown']) dy += 1;
+  if (keys['a'] || keys['arrowleft']) dx -= 1;
+  if (keys['d'] || keys['arrowright']) dx += 1;
+
+  p.isSprinting = !!keys['shift'] && p.energy > 5;
+  const spd = p.speed * (p.isSprinting ? 1.6 : 1.0);
+  if (dx !== 0 && dy !== 0) { dx *= 0.7071; dy *= 0.7071; }
+  p.isMoving = (dx !== 0 || dy !== 0);
+
+  if (p.isMoving) {
+    p.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+    p.walkCycle += p.isSprinting ? 0.35 : 0.2;
+    if (p.isSprinting) p.energy = Math.max(0, p.energy - 0.2);
+
+    if (Math.floor(p.walkCycle) % 4 === 0) {
+      AudioSys.step();
+      G.particles.push({ x: p.x + p.w / 2, y: p.y + p.h, vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5 - 0.5, c:'#D5C3A5', s:2.5, a:1 });
+    }
+
+    const nx = p.x + dx * spd, ny = p.y + dy * spd;
+    if (!isSolid(nx, p.y)) p.x = nx;
+    if (!isSolid(p.x, ny)) p.y = ny;
+  }
+  checkPrompt();
+}
+setInterval(updateMove, 1000 / 60);
+
+function isSolid(x, y) {
+  const tx = Math.floor((x + G.player.w / 2) / G.tileSize), ty = Math.floor((y + G.player.h / 2) / G.tileSize);
+  return G.map[ty] && (G.map[ty][tx] === 'water' || G.map[ty][tx] === 'mountain');
+}
+
+let targetEnt = null;
+function checkPrompt() {
+  const p = G.player, pc = { x: p.x + p.w / 2, y: p.y + p.h / 2 };
+  let close = null, minD = 50;
+  G.entities.forEach(e => {
+    const d = Math.hypot(pc.x - (e.x + 16), pc.y - (e.y + 16));
+    if (d < minD) { close = e; minD = d; }
+  });
+  targetEnt = close;
+  const pr = document.getElementById('promptBar'), pt = document.getElementById('promptTxt');
+  if (close) {
+    pr.style.display = 'flex';
+    if (close.type === 'npc') pt.textContent = `Bicara dengan ${close.n}`;
+    else if (close.type === 'animal') pt.textContent = `Belai ${close.n}`;
+    else if (close.type === 'berry_bush') pt.textContent = 'Petik Sweet Berry';
+    else if (close.type === 'apple_tree') pt.textContent = 'Guncang Pohon Apel';
+    else if (close.type === 'ore') pt.textContent = 'Tambang Kristal';
+    else if (close.type === 'fish_spot') pt.textContent = 'Mulai Memancing Ikan';
+    else if (close.type === 'chest') pt.textContent = close.open ? 'Peti Kosong' : 'Buka Peti Hadiah';
+  } else pr.style.display = 'none';
+}
+
+function interact() {
+  if (!targetEnt) return;
+  const e = targetEnt;
+  if (e.type === 'npc') {
+    openDlg(e.dlg);
+    QUESTS.forEach(q => { if (q.type === 'talk' && !q.done) completeQuest(q); });
+  } else if (e.type === 'animal') {
+    openDlg({ s: e.n, p: e.icon, t: e.t, opts:[{t:'❤️ Senang berteman!', a:'close'}] });
+  } else if (e.type === 'berry_bush') {
+    if (e.ready) { e.ready = false; addItem(ITEMS.berry, 2); setTimeout(() => e.ready = true, 20000); }
+    else showToast('Semak sedang menumbuhkan buah baru!');
+  } else if (e.type === 'apple_tree') {
+    if (e.apples > 0) { e.apples--; addItem(ITEMS.apple, 1); }
+    else showToast('Semua apel sudah dipetik!');
+  } else if (e.type === 'ore') {
+    if (e.hits > 0) {
+      e.hits--; AudioSys.pickup();
+      if (e.hits === 0) { addItem(ITEMS.amethyst, 1); showToast('💎 Kristal Amethyst berhasil ditambang!'); setTimeout(() => e.hits = 3, 30000); }
+    }
+  } else if (e.type === 'fish_spot') {
+    startFishing();
+  } else if (e.type === 'chest') {
+    if (!e.open) { e.open = true; AudioSys.lvlUp(); e.loot.forEach(l => addItem(l.it, l.c)); showToast('🎁 Peti Harta Dibuka!'); }
+    else showToast('Peti ini sudah kosong.');
+  }
+}
+
+let fish = { active: false, y: 50, vy: 0, targetY: 80, prog: 35, hold: false };
+function startFishing() { fish.active = true; fish.y = 50; fish.prog = 35; document.getElementById('fishPanel').style.display = 'flex'; }
+function closeFishing(win) {
+  fish.active = false; document.getElementById('fishPanel').style.display = 'none';
+  if (win) { AudioSys.lvlUp(); addItem(ITEMS.fish, 1); showToast('🎣 Berhasil menangkap Shimmer Trout!'); }
+}
+window.addEventListener('mousedown', () => { if (fish.active) fish.hold = true; });
+window.addEventListener('mouseup', () => { if (fish.active) fish.hold = false; });
+setInterval(() => {
+  if (!fish.active) return;
+  fish.targetY = Math.max(10, Math.min(130, fish.targetY + (Math.random() - 0.5) * 8));
+  document.getElementById('fishTarget').style.top = `${fish.targetY}px`;
+  fish.vy += (fish.hold || keys[' ']) ? -0.6 : 0.45;
+  fish.y = Math.max(0, Math.min(150, fish.y + fish.vy));
+  document.getElementById('fishHook').style.top = `${fish.y}px`;
+  if (fish.y >= fish.targetY && fish.y <= fish.targetY + 40) fish.prog += 0.8; else fish.prog -= 0.5;
+  fish.prog = Math.max(0, Math.min(100, fish.prog));
+  document.getElementById('fishMeterFill').style.width = `${fish.prog}%`;
+  if (fish.prog >= 100) closeFishing(true);
+}, 30);
+
+function openDlg(d) {
+  document.getElementById('dlgName').textContent = d.s;
+  document.getElementById('dlgIcon').textContent = d.p || '💬';
+  document.getElementById('dlgMsg').textContent = d.t;
+  const oBox = document.getElementById('dlgOptions'); oBox.innerHTML = '';
+  d.opts.forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'btn-opt'; b.textContent = o.t; b.onclick = () => handleDlg(o.a);
+    oBox.appendChild(b);
+  });
+  document.getElementById('dlgBox').style.display = 'block';
+}
+function closeDlg() { document.getElementById('dlgBox').style.display = 'none'; }
+function handleDlg(a) {
+  closeDlg();
+  if (a === 'shop') openModal('modalShop');
+  else if (a === 'heal') { G.player.energy = G.player.maxEnergy; showToast('✨ Energi dipulihkan Rowan!'); updateStatsUI(); }
+  else if (a === 'bread') { addItem(ITEMS.bread, 1); showToast('Mira memberimu Roti Madu!'); }
+}
+
+function addItem(it, c=1) {
+  const ex = G.player.inv.find(s => s.it.id === it.id);
+  if (ex) ex.c += c; else G.player.inv.push({ it, c });
+  for (let i = 0; i < 5; i++) {
+    if (!G.player.hotbar[i]) { G.player.hotbar[i] = it; break; }
+  }
+  showToast(`+${c} ${it.name} ${it.icon}`);
+  AudioSys.pickup(); checkQuestProgress(); renderHotbar(); renderInv();
+}
+
+function checkQuestProgress() {
+  QUESTS.forEach(q => {
+    if (!q.done && q.type === 'item') {
+      const f = G.player.inv.find(s => s.it.id === q.target);
+      if (f && f.c >= q.count) completeQuest(q);
+    }
+  });
+}
+
+function completeQuest(q) {
+  q.done = true; AudioSys.lvlUp(); addExp(q.exp);
+  showToast(`🎉 Quest Selesai: "${q.title}" (+${q.exp} EXP)`);
+  updateQuestHUD();
+}
+
+function addExp(n) {
+  G.player.exp += n;
+  if (G.player.exp >= G.player.maxExp) {
+    G.player.exp -= G.player.maxExp; G.player.lvl++;
+    G.player.maxHp += 20; G.player.hp = G.player.maxHp;
+    G.player.maxEnergy += 10; G.player.energy = G.player.maxEnergy;
+    showToast(`🌟 LEVEL UP! Level ${G.player.lvl}!`);
+  }
+  updateStatsUI();
+}
+
+setInterval(() => {
+  if (G.player.food > 0) G.player.food = Math.max(0, G.player.food - 0.4);
+  if (G.player.food > 50 && G.player.hp < G.player.maxHp) G.player.hp = Math.min(G.player.maxHp, G.player.hp + 1);
+  if (!G.player.isSprinting && G.player.energy < G.player.maxEnergy) G.player.energy = Math.min(G.player.maxEnergy, G.player.energy + 1.2);
+  G.player.coins = 999999;
+  updateStatsUI();
+}, 2000);
+
+setInterval(() => {
+  G.time = (G.time + 1) % G.daySecs;
+  if (G.time === 0) G.day++;
+  const m = Math.floor((G.time / G.daySecs) * 24 * 60);
+  const h = Math.floor(m / 60), min = m % 60;
+  const ap = h >= 12 ? 'PM' : 'AM', dh = h % 12 === 0 ? 12 : h % 12, dm = min < 10 ? '0' + min : min;
+  const ico = (h >= 18 || h < 5) ? '🌙' : '☀️';
+  document.getElementById('topClock').textContent = `${ico} Hari ${G.day} • ${dh}:${dm} ${ap} | 🍃 Sejuk`;
+}, 1000);
+
+function updateStatsUI() {
+  const p = G.player;
+  document.getElementById('barHp').style.width = `${(p.hp/p.maxHp)*100}%`;
+  document.getElementById('txtHp').textContent = `${Math.round(p.hp)}`;
+  document.getElementById('barEnergy').style.width = `${(p.energy/p.maxEnergy)*100}%`;
+  document.getElementById('txtEnergy').textContent = `${Math.round(p.energy)}`;
+  document.getElementById('barFood').style.width = `${(p.food/p.maxFood)*100}%`;
+  document.getElementById('txtFood').textContent = `${Math.round(p.food)}`;
+  document.getElementById('barExp').style.width = `${(p.exp/p.maxExp)*100}%`;
+  document.getElementById('txtExp').textContent = `Lv.${p.lvl}`;
+}
+
+let selectedInvIdx = 0;
+function openModal(id) {
+  closeAllModals();
+  const m = document.getElementById(id);
+  if (m) {
+    m.classList.add('active');
+    if (id === 'modalProfile') renderCustomizer();
+    if (id === 'modalInv') renderInv();
+    if (id === 'modalShop') renderShop();
+    if (id === 'modalQuests') renderQuests();
+    if (id === 'modalMap') renderMap();
+  }
+}
+function closeAllModals() { document.querySelectorAll('.modal-mask').forEach(m => m.classList.remove('active')); }
+
+function renderCustomizer() {
+  const c = G.player.custom;
+  setupPills('optHair', OPTS.hairs, c.hairStyle, id => { c.hairStyle = id; renderCustomizer(); });
+  setupPalette('palHair', OPTS.hairColors, c.hairColor, col => { c.hairColor = col; renderCustomizer(); });
+  setupPalette('palSkin', OPTS.skinColors, c.skinColor, col => { c.skinColor = col; renderCustomizer(); });
+  setupPills('optOutfit', OPTS.outfits, c.outfitStyle, id => { c.outfitStyle = id; renderCustomizer(); });
+  setupPalette('palOutfit', OPTS.outfitColors, c.outfitColor, col => { c.outfitColor = col; renderCustomizer(); });
+  setupPills('optHat', OPTS.hats, c.hat, id => { c.hat = id; renderCustomizer(); });
+  setupPills('optBack', OPTS.backs, c.back, id => { c.back = id; renderCustomizer(); });
+  setupPills('optTool', OPTS.tools, c.tool, id => { c.tool = id; renderCustomizer(); });
+  drawMirror(); drawMiniAvatar();
+}
+
+function setupPills(elId, list, cur, cb) {
+  const w = document.getElementById(elId); w.innerHTML = '';
+  list.forEach(it => {
+    const b = document.createElement('button');
+    b.className = `pill-opt ${cur === it.id ? 'active' : ''}`;
+    b.textContent = it.n; b.onclick = () => cb(it.id);
+    w.appendChild(b);
+  });
+}
+
+function setupPalette(elId, colors, cur, cb) {
+  const w = document.getElementById(elId); w.innerHTML = '';
+  colors.forEach(col => {
+    const s = document.createElement('div');
+    s.className = `swatch-dot ${cur === col ? 'active' : ''}`;
+    s.style.background = col; s.onclick = () => cb(col);
+    w.appendChild(s);
+  });
+}
+
+function drawMirror() {
+  const cvs = document.getElementById('mirrorCanvas'), ctx = cvs.getContext('2d');
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  drawCharacter(ctx, cvs.width / 2, cvs.height / 2 + 10, G.player.custom, 'down', 0, 2.5);
+}
+
+function drawMiniAvatar() {
+  const cvs = document.getElementById('hudAvatar'), ctx = cvs.getContext('2d');
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  drawCharacter(ctx, 22, 28, G.player.custom, 'down', 0, 1.0);
+}
+
+function randomizeAvatar() {
+  const c = G.player.custom;
+  c.hairStyle = OPTS.hairs[Math.floor(Math.random()*OPTS.hairs.length)].id;
+  c.hairColor = OPTS.hairColors[Math.floor(Math.random()*OPTS.hairColors.length)];
+  c.skinColor = OPTS.skinColors[Math.floor(Math.random()*OPTS.skinColors.length)];
+  c.outfitColor = OPTS.outfitColors[Math.floor(Math.random()*OPTS.outfitColors.length)];
+  c.hat = OPTS.hats[Math.floor(Math.random()*OPTS.hats.length)].id;
+  c.back = OPTS.backs[Math.floor(Math.random()*OPTS.backs.length)].id;
+  renderCustomizer();
+}
+
+function updateProfileMeta() {
+  G.player.custom.name = document.getElementById('inName').value || 'Haidar';
+  G.player.custom.title = document.getElementById('selTitle').value;
+  document.getElementById('hudName').textContent = G.player.custom.name;
+  document.getElementById('hudTitle').textContent = G.player.custom.title;
+  document.getElementById('mName').textContent = G.player.custom.name;
+  document.getElementById('mTitle').textContent = G.player.custom.title;
+}
+
+function renderInv() {
+  const g = document.getElementById('invGrid'); g.innerHTML = '';
+  G.player.inv.forEach((slot, i) => {
+    const c = document.createElement('div');
+    c.className = `inv-cell ${selectedInvIdx === i ? 'selected' : ''}`;
+    c.innerHTML = `<span>${slot.it.icon}</span><span class="c-count">${slot.c}</span>`;
+    c.onclick = () => { selectedInvIdx = i; renderInv(); };
+    g.appendChild(c);
+  });
+  for (let i = G.player.inv.length; i < 20; i++) {
+    const e = document.createElement('div'); e.className = 'inv-cell'; e.style.opacity = '0.3'; g.appendChild(e);
+  }
+  if (G.player.inv[selectedInvIdx]) {
+    const item = G.player.inv[selectedInvIdx].it;
+    document.getElementById('insIcon').textContent = item.icon;
+    document.getElementById('insName').textContent = item.name;
+    document.getElementById('insType').textContent = item.type;
+    document.getElementById('insDesc').textContent = item.desc;
+    document.getElementById('insEffect').textContent = item.food ? `+${item.food} Food, +${item.energy} Energy` : 'Perlengkapan / Bahan';
+    document.getElementById('btnUseItem').style.display = item.type === 'food' ? 'block' : 'none';
+  }
+}
+
+function useSelectedItem() {
+  const s = G.player.inv[selectedInvIdx];
+  if (!s || s.it.type !== 'food') return;
+  AudioSys.eat();
+  G.player.food = Math.min(G.player.maxFood, G.player.food + (s.it.food || 20));
+  G.player.energy = Math.min(G.player.maxEnergy, G.player.energy + (s.it.energy || 15));
+  G.player.hp = Math.min(G.player.maxHp, G.player.hp + (s.it.hp || 10));
+  showToast(`Menikmati ${s.it.name}! Food & Energy pulih.`);
+  s.c--;
+  if (s.c <= 0) { G.player.inv.splice(selectedInvIdx, 1); selectedInvIdx = 0; }
+  updateStatsUI(); renderInv();
+}
+
+function equipSelectedItem() {
+  const s = G.player.inv[selectedInvIdx];
+  if (!s) return;
+  if (s.it.type === 'hat') { G.player.custom.hat = s.it.id; showToast(`Topi dipasang: ${s.it.name}`); }
+  else if (s.it.type === 'back') { G.player.custom.back = s.it.id; showToast(`Aksesoris dipasang: ${s.it.name}`); }
+  else if (s.it.toolKey) { G.player.custom.tool = s.it.toolKey; showToast(`Alat terpasang: ${s.it.name}`); }
+  G.player.hotbar[G.player.activeHotbar] = s.it;
+  renderHotbar(); drawMiniAvatar();
+}
+
+function renderHotbar() {
+  const w = document.getElementById('hotbarList'); w.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const it = G.player.hotbar[i], s = document.createElement('div');
+    s.className = `hotbar-cell ${G.player.activeHotbar === i ? 'active' : ''}`;
+    s.innerHTML = `<span class="knum">${i+1}</span><span>${it ? it.icon : ''}</span>`;
+    s.onclick = () => selectHotbar(i);
+    w.appendChild(s);
+  }
+}
+
+function selectHotbar(i) {
+  G.player.activeHotbar = i; renderHotbar();
+  const it = G.player.hotbar[i];
+  if (it) {
+    showToast(`Slot ${i+1}: ${it.name}`);
+    if (it.toolKey) G.player.custom.tool = it.toolKey;
+  }
+}
+
+function renderShop() {
+  const g = document.getElementById('shopGrid'); g.innerHTML = '';
+  Object.values(ITEMS).forEach(it => {
+    const c = document.createElement('div'); c.className = 'shop-card';
+    c.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:24px;">${it.icon}</span>
+        <div><b style="font-size:12px;">${it.name}</b><div style="font-size:10px;color:var(--muted);">${it.desc}</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+        <span style="font-size:10px;font-weight:800;color:#8F5708;background:var(--amber-light);padding:2px 6px;border-radius:4px;">🪙 Gratis (∞)</span>
+        <button class="btn-pill" style="padding:3px 10px;font-size:10px;" onclick="buyItem('${it.id}')">Beli</button>
+      </div>
+    `;
+    g.appendChild(c);
+  });
+}
+function buyItem(id) {
+  AudioSys.coin(); addItem(ITEMS[id], 1);
+  showToast(`Berhasil membeli ${ITEMS[id].name}! Koinmu tetap 999,999 (Unlimited ∞)`);
+}
+
+function renderQuests() {
+  const l = document.getElementById('questList'); l.innerHTML = '';
+  QUESTS.forEach(q => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:#FFF;border:1.5px solid var(--border);border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center;';
+    div.innerHTML = `
+      <div>
+        <b style="font-size:12px;">${q.title}</b>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${q.desc}</div>
+        <div style="font-size:10px;color:var(--clay);font-weight:700;margin-top:3px;">Hadiah: +${q.exp} EXP</div>
+      </div>
+      <div><span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:10px;${q.done ? 'background:#D1E7DD;color:#0F5132;' : 'background:#FFF3CD;color:#664D03;'}">${q.done ? '✓ Selesai' : 'Aktif'}</span></div>
+    `;
+    l.appendChild(div);
+  });
+}
+
+function updateQuestHUD() {
+  const a = QUESTS.find(q => !q.done);
+  if (a) {
+    document.getElementById('qTitle').textContent = a.title;
+    document.getElementById('qDesc').textContent = a.desc;
+  } else {
+    document.getElementById('qTitle').textContent = '🌟 Semua Quest Selesai!';
+    document.getElementById('qDesc').textContent = 'Nikmati kedamaian di desa Sunfall.';
+  }
+}
+
+function renderMap() {
+  const cvs = document.getElementById('mapCanvas'), ctx = cvs.getContext('2d');
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  const sx = cvs.width / G.mapCols, sy = cvs.height / G.mapRows;
+  for (let r = 0; r < G.mapRows; r++) {
+    for (let c = 0; c < G.mapCols; c++) drawTile(ctx, G.map[r][c], c * sx, r * sy, sx + 0.5);
+  }
+  ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = '#2D2B29';
+  ctx.fillText('🏡 Sunfall', 32*sx - 20, 32*sy); ctx.fillText('💎 Gua Amber', 32*sx - 25, 8*sy);
+  ctx.fillText('🍎 Kebun Mira', 12*sx - 25, 30*sy); ctx.fillText('🌲 Hutan', 46*sx - 15, 30*sy); ctx.fillText('⛵ Danau', 32*sx - 15, 52*sy);
+
+  const px = (G.player.x + 13) / G.tileSize * sx, py = (G.player.y + 14) / G.tileSize * sy;
+  ctx.fillStyle = '#E63946'; ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#FFF'; ctx.lineWidth = 2; ctx.stroke();
+}
+
+function showToast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  if (G.toastTimer) clearTimeout(G.toastTimer);
+  G.toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function setupTouch() {
+  const b = (id, k) => {
+    const el = document.getElementById(id); if (!el) return;
+    el.addEventListener('touchstart', e => { e.preventDefault(); keys[k] = true; });
+    el.addEventListener('touchend', e => { e.preventDefault(); delete keys[k]; });
+  };
+  b('dpadU', 'w'); b('dpadD', 's'); b('dpadL', 'a'); b('dpadR', 'd');
+  const sp = document.getElementById('btnSprint');
+  if (sp) {
+    sp.addEventListener('touchstart', e => { e.preventDefault(); keys['shift'] = true; });
+    sp.addEventListener('touchend', e => { e.preventDefault(); delete keys['shift']; });
+  }
+  const ac = document.getElementById('btnAct');
+  if (ac) ac.addEventListener('click', e => { e.preventDefault(); interact(); });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  G.canvas = document.getElementById('gameCanvas');
+  G.ctx = G.canvas.getContext('2d');
+  initMap(); initEntities();
+  addItem(ITEMS.bread, 3); addItem(ITEMS.apple, 2); addItem(ITEMS.wand, 1); addItem(ITEMS.rod, 1); addItem(ITEMS.pickaxe, 1);
+  renderHotbar(); drawMiniAvatar(); updateStatsUI(); updateQuestHUD(); setupTouch();
+  setTimeout(() => showToast('✨ Selamat datang di Aesthetica Realm • Created by @newtoen Haidar'), 600);
+  requestAnimationFrame(render);
+});
+</script>
+</body>
+</html>
